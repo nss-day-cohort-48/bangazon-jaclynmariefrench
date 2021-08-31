@@ -81,8 +81,9 @@ class Profile(ViewSet):
             }
         """
         try:
-            current_user = Customer.objects.get(user=4)
-            current_user.recommends = Recommendation.objects.filter(recommender=current_user)
+            current_user = Customer.objects.get(user=request.auth.user)
+            current_user.recommends = Recommendation.objects.filter(
+                recommender=current_user)
 
             serializer = ProfileSerializer(
                 current_user, many=False, context={'request': request})
@@ -98,8 +99,7 @@ class Profile(ViewSet):
         current_user = Customer.objects.get(user=request.auth.user)
 
         if request.method == "DELETE":
-            """
-            @api {DELETE} /profile/cart DELETE all line items in cart
+            """@api {DELETE} /profile/cart DELETE all line items in cart
             @apiName DeleteCart
             @apiGroup UserProfile
 
@@ -182,8 +182,8 @@ class Profile(ViewSet):
                     line_items, many=True, context={'request': request})
 
                 cart = {}
-                cart["order"] = OrderSerializer(open_order, many=False, context={
-                                                'request': request}).data
+                cart["order"] = OrderSerializer(open_order, many=False,
+                                                context={'request': request}).data
                 cart["order"]["line_items"] = line_items.data
                 cart["order"]["size"] = len(line_items.data)
 
@@ -360,7 +360,8 @@ class RecommenderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recommendation
-        fields = ('product', 'customer',)
+        fields = ('product', 'customer', )
+        depth = 2
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -371,12 +372,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     """
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
-
+    customer_recs = RecommenderSerializer(many=True)
     class Meta:
         model = Customer
         fields = ('id', 'url', 'user', 'phone_number',
-                  'address', 'payment_types', 'recommends',)
-        depth = 1
+                  'address', 'payment_types', 'recommends', 'customer_recs')
 
 
 class FavoriteUserSerializer(serializers.HyperlinkedModelSerializer):
