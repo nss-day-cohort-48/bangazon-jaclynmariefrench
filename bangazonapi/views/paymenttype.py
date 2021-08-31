@@ -20,7 +20,7 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
             lookup_field='id'
         )
         fields = ('id', 'url', 'merchant_name', 'account_number',
-                  'expiration_date', 'create_date')
+                  'expiration_date', 'create_date', 'customer_id')
 
 
 class Payments(ViewSet):
@@ -51,6 +51,7 @@ class Payments(ViewSet):
         Returns:
             Response -- JSON serialized payment_type instance
         """
+
         try:
             payment_type = Payment.objects.get(pk=pk)
             serializer = PaymentSerializer(
@@ -81,10 +82,11 @@ class Payments(ViewSet):
         """Handle GET requests to payment type resource"""
         payment_types = Payment.objects.all()
 
-        customer_id = self.request.query_params.get('customer', None)
+        customer = Customer.objects.get(user=request.auth.user)
+        customer_id = customer.id
 
         if customer_id is not None:
-            payment_types = payment_types.filter(customer__id=customer_id)
+            payment_types = payment_types.filter(customer_id=customer_id)
 
         serializer = PaymentSerializer(
             payment_types, many=True, context={'request': request})
