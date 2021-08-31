@@ -3,8 +3,8 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
-from bangazonapi.models import *
-from bangazonapi.views import *
+from bangazonapi.views import Customers, Products, LineItems, Users, Orders
+from bangazonapi.views import Cart, Payments, Profile, ProductCategories, register_user, login_user
 
 # pylint: disable=invalid-name
 router = routers.DefaultRouter(trailing_slash=False)
