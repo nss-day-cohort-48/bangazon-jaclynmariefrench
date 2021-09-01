@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from rest_framework.response import Response
 from safedelete.models import SafeDeleteModel
 from safedelete.models import SOFT_DELETE
 from .customer import Customer
@@ -59,11 +60,13 @@ class Product(SafeDeleteModel):
         """
         ratings = ProductRating.objects.filter(product=self)
         total_rating = 0
-        for rating in ratings:
-            total_rating += rating.rating
-
-        avg = total_rating / len(ratings)
-        return avg
+        try:
+            for rating in ratings:
+                total_rating += rating.rating
+                avg = total_rating / len(ratings)
+                return avg
+        except ZeroDivisionError as error:
+            return Response({'message': error.args[0]},)
 
     class Meta:
         verbose_name = ("product")
