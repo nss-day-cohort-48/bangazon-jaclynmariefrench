@@ -19,7 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ('id', 'name', 'price', 'number_sold', 'description',
                   'quantity', 'created_date', 'location', 'image_path',
-                  'average_rating', 'can_be_rated', )
+                  'average_rating', 'can_be_rated', 'category_id' )
         depth = 1
 
 
@@ -96,7 +96,7 @@ class Products(ViewSet):
 
         product_category = ProductCategory.objects.get(pk=request.data["category_id"])
         new_product.category = product_category
-
+        
         if "image_path" in request.data:
             format, imgstr = request.data["image_path"].split(';base64,')
             ext = format.split('/')[-1]
