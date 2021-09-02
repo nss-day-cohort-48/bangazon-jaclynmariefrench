@@ -34,8 +34,8 @@ class Payments(ViewSet):
         new_payment = Payment()
         new_payment.merchant_name = request.data["merchant_name"]
         new_payment.account_number = request.data["account_number"]
-        new_payment.expiration_date = request.data["create_date"]
-        new_payment.create_date = request.data["expiration_date"]
+        new_payment.expiration_date = request.data["expiration_date"]
+        new_payment.create_date = request.data["create_date"]
         customer = Customer.objects.get(user=request.auth.user)
         new_payment.customer = customer
         new_payment.save()
@@ -57,8 +57,11 @@ class Payments(ViewSet):
             serializer = PaymentSerializer(
                 payment_type, context={'request': request})
             return Response(serializer.data)
+        except Payment.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
         except Exception as ex:
-            return HttpResponseServerError(ex)
+            return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for a single payment type
