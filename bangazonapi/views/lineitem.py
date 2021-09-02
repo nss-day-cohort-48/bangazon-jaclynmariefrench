@@ -49,7 +49,6 @@ class LineItems(ViewSet):
             HTTP/1.1 204 No Content
         """
         try:
-            # line_item = OrderProduct.objects.get(pk=pk)
             customer = Customer.objects.get(user=request.auth.user)
             line_item = OrderProduct.objects.get(pk=pk, order__customer=customer)
 
